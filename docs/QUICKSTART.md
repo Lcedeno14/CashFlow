@@ -15,7 +15,7 @@ This guide will help you get the Cash Flow application up and running quickly fo
 
 ```bash
 # Clone the repository
-git clone [repository-url]
+git clone https://github.com/Lcedeno14/CashFlow.git
 cd cash-flow
 
 # Install dependencies
