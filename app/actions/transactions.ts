@@ -1,0 +1,103 @@
+"use server"
+
+import { prisma } from "@/lib/prisma"
+import { getServerSession } from "next-auth"
+import { authOptions } from "../api/auth/[...nextauth]/route"
+
+export async function createTransaction(data: {
+  amount: number
+  type: "INCOME" | "EXPENSE"
+  description: string
+  categoryId: string
+  date?: Date
+}) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated")
+  }
+
+  return prisma.transaction.create({
+    data: {
+      ...data,
+      userId: session.user.id,
+    },
+  })
+}
+
+export async function getTransactions() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated")
+  }
+
+  return prisma.transaction.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    include: {
+      category: true,
+    },
+    orderBy: {
+      date: "desc",
+    },
+  })
+}
+
+export async function createCategory(data: {
+  name: string
+  type: "INCOME" | "EXPENSE"
+  color?: string
+  icon?: string
+}) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated")
+  }
+
+  return prisma.category.create({
+    data: {
+      ...data,
+      userId: session.user.id,
+    },
+  })
+}
+
+export async function getCategories() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated")
+  }
+
+  return prisma.category.findMany({
+    where: {
+      userId: session.user.id,
+    },
+  })
+}
+
+export async function getFinancialSummary() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated")
+  }
+
+  const transactions = await prisma.transaction.findMany({
+    where: {
+      userId: session.user.id,
+    },
+  })
+
+  const totalIncome = transactions
+    .filter((t) => t.type === "INCOME")
+    .reduce((sum, t) => sum + t.amount, 0)
+
+  const totalExpenses = transactions
+    .filter((t) => t.type === "EXPENSE")
+    .reduce((sum, t) => sum + t.amount, 0)
+
+  return {
+    totalBalance: totalIncome - totalExpenses,
+    totalIncome,
+    totalExpenses,
+  }
+} 
