@@ -13,6 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// User model for authentication and user data
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -28,6 +29,7 @@ model User {
   categories    Category[]
 }
 
+/// OAuth account connections
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -47,6 +49,7 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
+/// User session management
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -55,6 +58,7 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+/// Email verification tokens
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -63,24 +67,35 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Transaction {
-  id          String    @id @default(cuid())
-  amount      Float
-  type        String    // "INCOME" or "EXPENSE"
-  description String
-  date        DateTime  @default(now())
-  userId      String
-  categoryId  String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category    Category  @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+/// Transaction types enum
+enum TransactionType {
+  INCOME
+  EXPENSE
 }
 
+/// Transaction model for tracking income and expenses
+model Transaction {
+  id          String         @id @default(cuid())
+  amount      Float
+  type        TransactionType
+  description String
+  date        DateTime       @default(now())
+  userId      String
+  categoryId  String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    Category       @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([categoryId])
+}
+
+/// Category model for organizing transactions
 model Category {
   id           String        @id @default(cuid())
   name         String
-  type         String       // "INCOME" or "EXPENSE"
+  type         TransactionType
   color        String?      // For UI display
   icon         String?      // For UI display
   userId       String
@@ -90,4 +105,5 @@ model Category {
   updatedAt    DateTime     @updatedAt
 
   @@unique([name, userId])
+  @@index([userId])
 }
