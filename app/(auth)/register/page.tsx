@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,14 +18,19 @@ import { registerUser } from "@/app/actions/auth"
 import { signIn } from "next-auth/react"
 
 export default function RegisterPage() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  })
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setLoading(true)
-    setError("")
+    setIsLoading(true)
 
     const formData = new FormData(event.currentTarget)
     const data = {
@@ -36,8 +41,7 @@ export default function RegisterPage() {
     }
 
     if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match")
-      setLoading(false)
+      setIsLoading(false)
       return
     }
 
@@ -49,7 +53,6 @@ export default function RegisterPage() {
       })
 
       if (!result.success) {
-        setError(result.error || "Failed to create account")
         return
       }
 
@@ -61,15 +64,14 @@ export default function RegisterPage() {
       })
 
       if (signInResult?.error) {
-        setError("Failed to sign in")
         return
       }
 
-      router.push("/dashboard")
+      router.push(callbackUrl)
     } catch (error) {
-      setError("Something went wrong")
+      // Handle error
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
@@ -83,9 +85,6 @@ export default function RegisterPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          {error && (
-            <div className="text-sm font-medium text-red-500">{error}</div>
-          )}
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
             <Input id="name" name="name" type="text" required />
@@ -115,8 +114,8 @@ export default function RegisterPage() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button className="w-full" type="submit" disabled={loading}>
-            {loading ? "Creating Account..." : "Create Account"}
+          <Button className="w-full" type="submit" disabled={isLoading}>
+            {isLoading ? "Creating Account..." : "Create Account"}
           </Button>
           <p className="text-sm text-center text-muted-foreground">
             Already have an account?{" "}

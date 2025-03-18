@@ -22,6 +22,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createTransaction } from "@/app/actions/transactions"
 
+interface FormData {
+  amount: string
+  type: "INCOME" | "EXPENSE"
+  description: string
+  categoryId: string
+  date: string
+}
+
 export function AddTransactionDialog({
   categories,
   onTransactionAdded,
@@ -30,21 +38,26 @@ export function AddTransactionDialog({
   onTransactionAdded: () => void
 }) {
   const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [type, setType] = useState<"INCOME" | "EXPENSE">("EXPENSE")
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState<FormData>({
+    amount: "",
+    type: "EXPENSE",
+    description: "",
+    categoryId: "",
+    date: new Date().toISOString().split("T")[0],
+  })
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setLoading(true)
+    setIsLoading(true)
 
     try {
-      const formData = new FormData(event.currentTarget)
       const data = {
-        amount: parseFloat(formData.get("amount") as string),
-        type: type,
-        description: formData.get("description") as string,
-        categoryId: formData.get("category") as string,
-        date: new Date(),
+        amount: parseFloat(formData.amount),
+        type: formData.type,
+        description: formData.description,
+        categoryId: formData.categoryId,
+        date: new Date(formData.date),
       }
 
       await createTransaction(data)
@@ -53,11 +66,11 @@ export function AddTransactionDialog({
     } catch (error) {
       console.error("Failed to create transaction:", error)
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
-  const filteredCategories = categories.filter((c) => c.type === type)
+  const filteredCategories = categories.filter((c) => c.type === formData.type)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -76,8 +89,8 @@ export function AddTransactionDialog({
             <div className="grid gap-2">
               <Label htmlFor="type">Type</Label>
               <Select
-                value={type}
-                onValueChange={(value: "INCOME" | "EXPENSE") => setType(value)}
+                value={formData.type}
+                onValueChange={(value: "INCOME" | "EXPENSE") => setFormData({ ...formData, type: value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
@@ -96,6 +109,8 @@ export function AddTransactionDialog({
                 type="number"
                 step="0.01"
                 required
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
               />
             </div>
             <div className="grid gap-2">
@@ -105,11 +120,13 @@ export function AddTransactionDialog({
                 name="description"
                 type="text"
                 required
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="category">Category</Label>
-              <Select name="category" required>
+              <Select name="category" required value={formData.categoryId} onValueChange={(value) => setFormData({ ...formData, categoryId: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
@@ -122,10 +139,21 @@ export function AddTransactionDialog({
                 </SelectContent>
               </Select>
             </div>
+            <div className="grid gap-2">
+              <Label htmlFor="date">Date</Label>
+              <Input
+                id="date"
+                name="date"
+                type="date"
+                required
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              />
+            </div>
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Adding..." : "Add Transaction"}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Adding..." : "Add Transaction"}
             </Button>
           </DialogFooter>
         </form>

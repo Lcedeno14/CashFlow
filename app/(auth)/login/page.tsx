@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
@@ -17,14 +17,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export default function LoginPage() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  })
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setLoading(true)
-    setError("")
+    setIsLoading(true)
 
     const formData = new FormData(event.currentTarget)
     const email = formData.get("email") as string
@@ -38,15 +42,14 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
-        setError("Invalid email or password")
         return
       }
 
-      router.push("/dashboard")
+      router.push(callbackUrl)
     } catch (error) {
-      setError("Something went wrong")
+      // Handle error
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
@@ -60,9 +63,6 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          {error && (
-            <div className="text-sm font-medium text-red-500">{error}</div>
-          )}
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -79,13 +79,13 @@ export default function LoginPage() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button className="w-full" type="submit" disabled={loading}>
-            {loading ? "Signing in..." : "Sign in"}
+          <Button className="w-full" type="submit" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign in"}
           </Button>
-          <p className="text-sm text-center text-muted-foreground">
-            Don't have an account?{" "}
+          <p className="text-sm text-muted-foreground">
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="text-primary hover:underline">
-              Create one
+              Sign up
             </Link>
           </p>
         </CardFooter>

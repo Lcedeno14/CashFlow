@@ -1,13 +1,16 @@
 import { Metadata } from "next"
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
-import { authOptions } from "../../api/auth/[...nextauth]/route"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { Header } from "@/app/components/dashboard/header"
+import { DashboardStats } from "@/app/components/dashboard/dashboard-stats"
+import { RecentTransactions } from "@/app/components/dashboard/recent-transactions"
+import { CategoryDistribution } from "@/app/components/dashboard/category-distribution"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AddTransactionDialog } from "@/app/components/transactions/add-transaction-dialog"
 import { AddCategoryDialog } from "@/app/components/categories/add-category-dialog"
 import { ActionButtons } from "@/app/components/dashboard/action-buttons"
-import { Header } from "@/app/components/dashboard/header"
 import { getCategories, getFinancialSummary, getTransactions } from "../../actions/transactions"
 import {
   Table,
