@@ -1,15 +1,15 @@
 "use server"
 
-import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
-import { authOptions } from "../api/auth/[...nextauth]/route"
+import { prisma } from "@/lib/prisma"
+import { authOptions } from "@/app/api/auth/[...nextauth]/options"
 
 export async function createTransaction(data: {
   amount: number
   type: "INCOME" | "EXPENSE"
   description: string
   categoryId: string
-  date?: Date
+  date: Date
 }) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
@@ -20,6 +20,9 @@ export async function createTransaction(data: {
     data: {
       ...data,
       userId: session.user.id,
+    },
+    include: {
+      category: true,
     },
   })
 }
@@ -96,8 +99,8 @@ export async function getFinancialSummary() {
     .reduce((sum, t) => sum + t.amount, 0)
 
   return {
-    totalBalance: totalIncome - totalExpenses,
     totalIncome,
     totalExpenses,
+    totalBalance: totalIncome - totalExpenses,
   }
 } 

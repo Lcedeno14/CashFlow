@@ -1,16 +1,10 @@
 import { Metadata } from "next"
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/app/api/auth/[...nextauth]/options"
 import { Header } from "@/app/components/dashboard/header"
-import { DashboardStats } from "@/app/components/dashboard/dashboard-stats"
-import { RecentTransactions } from "@/app/components/dashboard/recent-transactions"
-import { CategoryDistribution } from "@/app/components/dashboard/category-distribution"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { AddTransactionDialog } from "@/app/components/transactions/add-transaction-dialog"
-import { AddCategoryDialog } from "@/app/components/categories/add-category-dialog"
-import { ActionButtons } from "@/app/components/dashboard/action-buttons"
+import { ActionButtonsWrapper } from "@/app/components/dashboard/action-buttons-wrapper"
 import { getCategories, getFinancialSummary, getTransactions } from "../../actions/transactions"
 import {
   Table,
@@ -61,7 +55,7 @@ export default async function DashboardPage() {
       <Header userName={session.user?.name} />
       <div className="container mx-auto py-10">
         <div className="flex justify-end mb-8">
-          <ActionButtons categories={categories} />
+          <ActionButtonsWrapper categories={categories} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

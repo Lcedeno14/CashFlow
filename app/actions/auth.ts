@@ -1,26 +1,7 @@
-'use server'
+"use server"
 
 import { hash } from "bcryptjs"
 import { prisma } from "@/lib/prisma"
-import type { PrismaClient } from "@prisma/client"
-
-const DEFAULT_CATEGORIES = [
-  // Income categories
-  { name: "Salary", type: "INCOME", color: "#22c55e" },
-  { name: "Freelance", type: "INCOME", color: "#3b82f6" },
-  { name: "Investments", type: "INCOME", color: "#6366f1" },
-  { name: "Other Income", type: "INCOME", color: "#8b5cf6" },
-  
-  // Expense categories
-  { name: "Housing", type: "EXPENSE", color: "#ef4444" },
-  { name: "Transportation", type: "EXPENSE", color: "#f97316" },
-  { name: "Food", type: "EXPENSE", color: "#eab308" },
-  { name: "Utilities", type: "EXPENSE", color: "#84cc16" },
-  { name: "Healthcare", type: "EXPENSE", color: "#06b6d4" },
-  { name: "Entertainment", type: "EXPENSE", color: "#ec4899" },
-  { name: "Shopping", type: "EXPENSE", color: "#f43f5e" },
-  { name: "Other Expenses", type: "EXPENSE", color: "#64748b" },
-]
 
 export async function registerUser(data: {
   name: string
@@ -28,10 +9,25 @@ export async function registerUser(data: {
   password: string
 }) {
   try {
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email: data.email,
+      },
+    })
+
+    if (existingUser) {
+      return {
+        success: false,
+        error: "User already exists",
+      }
+    }
+
+    // Hash password
     const hashedPassword = await hash(data.password, 10)
 
     // Create user with a transaction to ensure both user and categories are created
-    const user = await prisma.$transaction(async (tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>) => {
+    const user = await prisma.$transaction(async (tx) => {
       // Create the user
       const newUser = await tx.user.create({
         data: {
@@ -42,26 +38,38 @@ export async function registerUser(data: {
       })
 
       // Create default categories for the user
-      await Promise.all(
-        DEFAULT_CATEGORIES.map((category) =>
-          tx.category.create({
-            data: {
-              ...category,
-              userId: newUser.id,
-            },
-          })
-        )
-      )
+      const defaultCategories = [
+        { name: "Salary", type: "INCOME" as const, color: "#22c55e" },
+        { name: "Investments", type: "INCOME" as const, color: "#3b82f6" },
+        { name: "Other Income", type: "INCOME" as const, color: "#8b5cf6" },
+        { name: "Housing", type: "EXPENSE" as const, color: "#ef4444" },
+        { name: "Transportation", type: "EXPENSE" as const, color: "#f97316" },
+        { name: "Food", type: "EXPENSE" as const, color: "#eab308" },
+        { name: "Utilities", type: "EXPENSE" as const, color: "#14b8a6" },
+        { name: "Healthcare", type: "EXPENSE" as const, color: "#f43f5e" },
+        { name: "Entertainment", type: "EXPENSE" as const, color: "#a855f7" },
+        { name: "Other Expenses", type: "EXPENSE" as const, color: "#64748b" },
+      ]
+
+      await tx.category.createMany({
+        data: defaultCategories.map((category) => ({
+          ...category,
+          userId: newUser.id,
+        })),
+      })
 
       return newUser
     })
 
-    return { success: true, data: user }
+    return {
+      success: true,
+      user,
+    }
   } catch (error) {
     console.error("Registration error:", error)
-    if (error instanceof Error) {
-      return { success: false, error: error.message }
+    return {
+      success: false,
+      error: "Failed to create account",
     }
-    return { success: false, error: "Failed to create user" }
   }
 } 

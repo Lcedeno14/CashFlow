@@ -1,29 +1,47 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { AddCategoryDialog } from "@/app/components/categories/add-category-dialog"
-import { AddTransactionDialog } from "@/app/components/transactions/add-transaction-dialog"
+import { AddCategoryDialog } from '@/app/components/categories/add-category-dialog'
+import { AddTransactionDialog } from '@/app/components/transactions/add-transaction-dialog'
+import { Category as PrismaCategory } from '@prisma/client'
 
-type Category = {
+interface Category {
   id: string
   name: string
   type: "INCOME" | "EXPENSE"
-  color?: string | null
-  userId: string
+  color?: string
+  icon?: string
 }
 
-export function ActionButtons({ categories }: { categories: Category[] }) {
-  const router = useRouter()
+interface ActionButtonsProps {
+  categories: PrismaCategory[]
+  onCategoryAdded: () => void
+  onTransactionAdded: () => void
+}
 
+export function ActionButtons({
+  categories,
+  onCategoryAdded,
+  onTransactionAdded,
+}: ActionButtonsProps) {
   const handleChange = () => {
-    router.refresh()
+    onCategoryAdded()
+    onTransactionAdded()
   }
 
+  // Convert Prisma categories to the format expected by the dialog
+  const dialogCategories: Category[] = categories.map(cat => ({
+    id: cat.id,
+    name: cat.name,
+    type: cat.type,
+    color: cat.color || undefined,
+    icon: cat.icon || undefined
+  }))
+
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-2">
       <AddCategoryDialog onCategoryAdded={handleChange} />
       <AddTransactionDialog
-        categories={categories}
+        categories={dialogCategories}
         onTransactionAdded={handleChange}
       />
     </div>

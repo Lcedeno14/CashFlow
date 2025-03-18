@@ -22,6 +22,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createTransaction } from "@/app/actions/transactions"
 
+interface Category {
+  id: string
+  name: string
+  type: "INCOME" | "EXPENSE"
+  color?: string
+  icon?: string
+}
+
 interface FormData {
   amount: string
   type: "INCOME" | "EXPENSE"
@@ -34,7 +42,7 @@ export function AddTransactionDialog({
   categories,
   onTransactionAdded,
 }: {
-  categories: any[]
+  categories: Category[]
   onTransactionAdded: () => void
 }) {
   const [open, setOpen] = useState(false)

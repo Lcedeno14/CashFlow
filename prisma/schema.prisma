@@ -96,7 +96,7 @@ model Category {
   id           String        @id @default(cuid())
   name         String
   type         TransactionType
-  color        String?      // For UI display
+  color        String        @default("#64748b") // Default gray color
   icon         String?      // For UI display
   userId       String
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
