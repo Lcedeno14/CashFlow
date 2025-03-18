@@ -16,10 +16,10 @@ This guide will help you get the Cash Flow application up and running quickly fo
 ```bash
 # Clone the repository
 git clone https://github.com/Lcedeno14/CashFlow.git
-cd cash-flow
+cd CashFlow
 
 # Install dependencies
-npm install
+ npm install --legacy-peer-deps
 ```
 
 ### 2. Environment Setup
