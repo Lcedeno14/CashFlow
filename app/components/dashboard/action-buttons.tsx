@@ -38,7 +38,7 @@ export function ActionButtons({
   }))
 
   return (
-    <div className="flex gap-2">
+    <div className="inline-flex gap-2">
       <AddCategoryDialog onCategoryAdded={handleChange} />
       <AddTransactionDialog
         categories={dialogCategories}

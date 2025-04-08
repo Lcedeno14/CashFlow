@@ -30,27 +30,25 @@ export function Header({ userName }: { userName?: string | null }) {
         <div className="flex justify-between items-center">
           <Link 
             href="/dashboard" 
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <DollarSign className="h-6 w-6 text-primary" />
             <span className="text-xl font-semibold">Cash Flow</span>
           </Link>
           
-          <div className="flex items-center gap-4">
+          <div className="inline-flex items-center gap-4">
             <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
                   <Avatar>
                     <AvatarFallback>{initials}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel>
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{userName}</p>
-                  </div>
+                <DropdownMenuLabel className="font-normal">
+                  <p className="text-sm font-medium leading-none">{userName}</p>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push("/settings")}>
@@ -58,7 +56,7 @@ export function Header({ userName }: { userName?: string | null }) {
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="text-red-600"
+                  className="text-red-600 hover:text-red-700"
                   onClick={() => signOut({ callbackUrl: "/login" })}
                 >
                   <LogOut className="mr-2 h-4 w-4" />

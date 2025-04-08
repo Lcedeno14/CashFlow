@@ -58,7 +58,7 @@ export default async function DashboardPage() {
           <ActionButtonsWrapper categories={categories} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-3 mb-8">
           <Card>
             <CardHeader>
               <CardTitle>Total Balance</CardTitle>
@@ -91,7 +91,7 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-[2fr_1fr]">
           <Card>
             <CardHeader>
               <CardTitle>Recent Transactions</CardTitle>
@@ -116,16 +116,10 @@ export default async function DashboardPage() {
                       <TableCell>{transaction.description}</TableCell>
                       <TableCell>{transaction.category.name}</TableCell>
                       <TableCell>{transaction.type}</TableCell>
-                      <TableCell className="text-right">
-                        <span
-                          className={
-                            transaction.type === "INCOME"
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }
-                        >
-                          ${transaction.amount.toFixed(2)}
-                        </span>
+                      <TableCell className={`text-right ${
+                        transaction.type === "INCOME" ? "text-green-600" : "text-red-600"
+                      }`}>
+                        ${transaction.amount.toFixed(2)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -139,10 +133,10 @@ export default async function DashboardPage() {
               <CardTitle>Categories</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4">
+              <div className="space-y-6">
                 <div>
                   <h3 className="font-semibold mb-2">Income Categories</h3>
-                  <div className="grid gap-2">
+                  <div className="space-y-2">
                     {categories
                       .filter((c: Category) => c.type === "INCOME")
                       .map((category: Category) => (
@@ -160,7 +154,7 @@ export default async function DashboardPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-2">Expense Categories</h3>
-                  <div className="grid gap-2">
+                  <div className="space-y-2">
                     {categories
                       .filter((c: Category) => c.type === "EXPENSE")
                       .map((category: Category) => (
