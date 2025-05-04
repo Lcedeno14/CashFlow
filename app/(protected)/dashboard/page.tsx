@@ -5,24 +5,12 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options"
 import { Header } from "@/app/components/dashboard/header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getCategories, getFinancialSummary, getTransactions } from "../../actions/transactions"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { DeleteTransactionDialog } from "@/app/components/transactions/delete-transaction-dialog"
-import { DeleteCategoryDialog } from "@/app/components/categories/delete-category-dialog"
+import { TransactionsTable } from "@/app/components/dashboard/TransactionsTable"
 import DashboardGraphSwitcher from "@/components/dashboard/DashboardGraphSwitcher"
 import { getTotalsByCategory, getCashFlowByDate, getMonthlyIncomeExpense } from "@/lib/data"
-import { AddCategoryDialog } from "@/app/components/categories/add-category-dialog"
-import { AddTransactionDialog } from "@/app/components/transactions/add-transaction-dialog"
-import { TransactionsCardHeader } from "@/app/components/dashboard/TransactionsCardHeader"
 import { CategoriesCardHeader } from "@/app/components/dashboard/CategoriesCardHeader"
-import { TransactionRow } from "@/app/components/dashboard/TransactionRow"
-import { TransactionsTable } from "@/app/components/dashboard/TransactionsTable"
+import { TransactionsCardHeader } from "@/app/components/dashboard/TransactionsCardHeader"
+import { DeleteCategoryDialog } from "@/app/components/categories/delete-category-dialog"
 
 type Category = {
   id: string
@@ -30,15 +18,6 @@ type Category = {
   type: "INCOME" | "EXPENSE"
   color?: string | null
   userId: string
-}
-
-type Transaction = {
-  id: string
-  amount: number
-  type: "INCOME" | "EXPENSE"
-  description: string
-  date: Date
-  category: Category
 }
 
 export const metadata: Metadata = {
@@ -65,12 +44,6 @@ export default async function DashboardPage() {
     getCashFlowByDate(session.user.id, from, to),
     getMonthlyIncomeExpense(session.user.id, year),
   ])
-
-  // Fix icon type for AddTransactionDialog
-  const dialogCategories = categories.map(cat => ({
-    ...cat,
-    icon: cat.icon || undefined,
-  }));
 
   return (
     <div>

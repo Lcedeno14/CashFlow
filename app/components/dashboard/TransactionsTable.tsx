@@ -3,7 +3,6 @@ import { useState } from "react"
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -28,7 +27,7 @@ type Transaction = {
 }
 
 export function TransactionsTable({ transactions: initialTransactions, categories }: { transactions: Transaction[], categories: Category[] }) {
-  const [transactions, setTransactions] = useState(initialTransactions)
+  const transactions = initialTransactions
 
   // Simple reload: just reload the page for now (could be improved to refetch data client-side)
   const handleTransactionUpdated = () => {

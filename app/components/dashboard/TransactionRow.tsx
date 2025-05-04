@@ -20,6 +20,16 @@ type Transaction = {
 }
 
 export function TransactionRow({ transaction, categories, onTransactionUpdated }: { transaction: Transaction, categories: Category[], onTransactionUpdated: () => void }) {
+  // Ensure color is always string | undefined
+  const safeCategories = categories.map(c => ({ ...c, color: c.color || undefined }));
+  // Ensure transaction.category.color is string | undefined
+  const safeTransaction = {
+    ...transaction,
+    category: {
+      ...transaction.category,
+      color: transaction.category.color || undefined,
+    },
+  };
   return (
     <>
       <TableCell>
@@ -34,7 +44,7 @@ export function TransactionRow({ transaction, categories, onTransactionUpdated }
         ${transaction.amount.toFixed(2)}
       </TableCell>
       <TableCell className="text-right">
-        <EditTransactionDialog transaction={transaction} categories={categories} onTransactionUpdated={onTransactionUpdated}>
+        <EditTransactionDialog transaction={safeTransaction} categories={safeCategories} onTransactionUpdated={onTransactionUpdated}>
           <button className="text-blue-600 hover:text-blue-800">Edit</button>
         </EditTransactionDialog>
       </TableCell>

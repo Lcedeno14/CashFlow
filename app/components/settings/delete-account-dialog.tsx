@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { signOut } from "next-auth/react"
 import {
   AlertDialog,
@@ -19,7 +18,6 @@ import { Icons } from "@/app/components/icons"
 
 export function DeleteAccountDialog() {
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
 
   const handleDelete = async () => {
     try {
