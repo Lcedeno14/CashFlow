@@ -100,7 +100,7 @@ export default async function DashboardPage() {
               <div className="space-y-6">
                 <div>
                   <h3 className="font-semibold mb-2">Income Categories</h3>
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     {categories
                       .filter((c: Category) => c.type === "INCOME")
                       .map((category: Category) => (
@@ -119,7 +119,7 @@ export default async function DashboardPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-2">Expense Categories</h3>
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     {categories
                       .filter((c: Category) => c.type === "EXPENSE")
                       .map((category: Category) => (
