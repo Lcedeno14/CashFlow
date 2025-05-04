@@ -12,9 +12,9 @@ const COLORS = [
   "var(--chart-6)",
 ]
 
-export default function IncomeCategoryDonut({ data }) {
+export default function IncomeCategoryDonut({ data }: { data: { name: string; value: number }[] }) {
   const config = Object.fromEntries(
-    data.map((d, i) => [d.name, { label: d.name, color: COLORS[i % COLORS.length] }])
+    data.map((d: { name: string; value: number }, i: number) => [d.name, { label: d.name, color: COLORS[i % COLORS.length] }])
   )
 
   return (
