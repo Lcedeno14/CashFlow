@@ -122,3 +122,11 @@ This project is licensed under the MIT License.
 ---
 
 *Prepared by Vedi, Veronica, and Luis for the GUI Final Project, Spring 2024.*
+
+## Screenshots
+
+Here are some screenshots of the CashFlow application:
+
+- **Sign In Page**: ![Sign In](docs/SignInScreenshot.png)
+- **Dashboard**: ![Dashboard](docs/Screenshot1.png)
+- **Transaction Management**: ![Transactions](docs/Screenshot2.png)
