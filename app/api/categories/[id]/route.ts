@@ -3,7 +3,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/options"
 import { prisma } from "@/lib/prisma"
 
-export async function DELETE(request: Request, context: { params: { id: string } }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function DELETE(request: Request, context: any) {
   const { id } = context.params;
   try {
     const session = await getServerSession(authOptions)
