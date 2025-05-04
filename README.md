@@ -115,10 +115,6 @@ classDiagram
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
-
-This project is licensed under the MIT License.
-
 ---
 
 *Prepared by Vedi, Veronica, and Luis for the GUI Final Project, Spring 2024.*
