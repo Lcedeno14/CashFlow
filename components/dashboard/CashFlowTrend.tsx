@@ -12,6 +12,23 @@ const COLORS = [
   "var(--chart-2)",
 ]
 
+const legendFormatter = (value: string) => {
+  const color = value === "income" ? COLORS[0] : COLORS[1];
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+      <span style={{
+        display: "inline-block",
+        width: 12,
+        height: 12,
+        borderRadius: "50%",
+        background: color,
+        marginRight: 6,
+      }} />
+      {value}
+    </span>
+  );
+};
+
 export default function CashFlowTrend({ data }: CashFlowTrendProps) {
   const config = {
     income: { label: "Income", color: COLORS[0] },
@@ -26,7 +43,7 @@ export default function CashFlowTrend({ data }: CashFlowTrendProps) {
             <XAxis dataKey="date" tickLine={false} />
             <YAxis tickFormatter={v => `$${v}`} />
             <Tooltip formatter={v => `$${v}`} />
-            <Legend />
+            <Legend formatter={legendFormatter} />
             <Area dataKey="income" stackId="1" type="monotone" fill={COLORS[0]} />
             <Area dataKey="expense" stackId="1" type="monotone" fill={COLORS[1]} />
           </AreaChart>
