@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Header } from "@/app/components/dashboard/header"
 import { Separator } from "@/components/ui/separator"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { DeleteAccountDialog } from "@/app/components/settings/delete-account-dialog"
 
 export const metadata: Metadata = {
   title: "Settings - Cash Flow",
@@ -75,6 +76,18 @@ export default async function SettingsPage() {
                 </div>
                 <ThemeToggle />
               </div>
+            </div>
+
+            <Separator className="my-6" />
+
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-medium text-destructive">Danger Zone</h3>
+                <p className="text-sm text-muted-foreground">
+                  Irreversible and destructive actions.
+                </p>
+              </div>
+              <DeleteAccountDialog />
             </div>
           </CardContent>
         </Card>

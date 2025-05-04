@@ -103,4 +103,36 @@ export async function getFinancialSummary() {
     totalExpenses,
     totalBalance: totalIncome - totalExpenses,
   }
+}
+
+export async function updateTransaction(id: string, data: {
+  amount: number
+  type: "INCOME" | "EXPENSE"
+  description: string
+  categoryId: string
+  date: Date
+}) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated")
+  }
+
+  // Ensure the transaction belongs to the user
+  const transaction = await prisma.transaction.findUnique({
+    where: { id },
+    include: { category: true },
+  })
+  if (!transaction || transaction.userId !== session.user.id) {
+    throw new Error("Unauthorized")
+  }
+
+  return prisma.transaction.update({
+    where: { id },
+    data: {
+      ...data,
+    },
+    include: {
+      category: true,
+    },
+  })
 } 

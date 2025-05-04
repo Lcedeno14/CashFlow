@@ -4,7 +4,6 @@ import { redirect } from "next/navigation"
 import { authOptions } from "@/app/api/auth/[...nextauth]/options"
 import { Header } from "@/app/components/dashboard/header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ActionButtonsWrapper } from "@/app/components/dashboard/action-buttons-wrapper"
 import { getCategories, getFinancialSummary, getTransactions } from "../../actions/transactions"
 import {
   Table,
@@ -14,6 +13,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { DeleteTransactionDialog } from "@/app/components/transactions/delete-transaction-dialog"
+import { DeleteCategoryDialog } from "@/app/components/categories/delete-category-dialog"
+import DashboardGraphSwitcher from "@/components/dashboard/DashboardGraphSwitcher"
+import { getTotalsByCategory, getCashFlowByDate, getMonthlyIncomeExpense } from "@/lib/data"
+import { AddCategoryDialog } from "@/app/components/categories/add-category-dialog"
+import { AddTransactionDialog } from "@/app/components/transactions/add-transaction-dialog"
+import { TransactionsCardHeader } from "@/app/components/dashboard/TransactionsCardHeader"
+import { CategoriesCardHeader } from "@/app/components/dashboard/CategoriesCardHeader"
+import { TransactionRow } from "@/app/components/dashboard/TransactionRow"
+import { TransactionsTable } from "@/app/components/dashboard/TransactionsTable"
 
 type Category = {
   id: string
@@ -44,20 +53,29 @@ export default async function DashboardPage() {
     redirect("/login")
   }
 
-  const [summary, transactions, categories] = await Promise.all([
+  const from = new Date('2000-01-01');
+  const to = new Date();
+  const year = new Date().getFullYear();
+  const [summary, transactions, categories, expenseCategoryData, incomeCategoryData, cashFlowData, monthlyData] = await Promise.all([
     getFinancialSummary(),
     getTransactions(),
     getCategories(),
+    getTotalsByCategory({ userId: session.user.id, range: { from, to }, type: "EXPENSE" }),
+    getTotalsByCategory({ userId: session.user.id, range: { from, to }, type: "INCOME" }),
+    getCashFlowByDate(session.user.id, from, to),
+    getMonthlyIncomeExpense(session.user.id, year),
   ])
+
+  // Fix icon type for AddTransactionDialog
+  const dialogCategories = categories.map(cat => ({
+    ...cat,
+    icon: cat.icon || undefined,
+  }));
 
   return (
     <div>
       <Header userName={session.user?.name} />
       <div className="container mx-auto py-10">
-        <div className="flex justify-end mb-8">
-          <ActionButtonsWrapper categories={categories} />
-        </div>
-
         <div className="grid gap-6 grid-cols-1 md:grid-cols-3 mb-8">
           <Card>
             <CardHeader>
@@ -94,43 +112,16 @@ export default async function DashboardPage() {
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-[2fr_1fr]">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Transactions</CardTitle>
+              <TransactionsCardHeader categories={categories} />
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {transactions.map((transaction: Transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell>
-                        {new Date(transaction.date).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>{transaction.description}</TableCell>
-                      <TableCell>{transaction.category.name}</TableCell>
-                      <TableCell>{transaction.type}</TableCell>
-                      <TableCell className={`text-right ${
-                        transaction.type === "INCOME" ? "text-green-600" : "text-red-600"
-                      }`}>
-                        ${transaction.amount.toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <TransactionsTable transactions={transactions} categories={categories} />
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Categories</CardTitle>
+              <CategoriesCardHeader />
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -140,15 +131,16 @@ export default async function DashboardPage() {
                     {categories
                       .filter((c: Category) => c.type === "INCOME")
                       .map((category: Category) => (
-                        <div
-                          key={category.id}
-                          className="flex items-center justify-between p-2 rounded-lg border"
-                          style={{
-                            borderColor: category.color || "#e2e8f0",
-                          }}
-                        >
-                          <span>{category.name}</span>
-                        </div>
+                        <DeleteCategoryDialog key={category.id} category={category}>
+                          <div
+                            className="flex items-center justify-between p-2 rounded-lg border cursor-pointer hover:bg-muted/50"
+                            style={{
+                              borderColor: category.color || "#e2e8f0",
+                            }}
+                          >
+                            <span>{category.name}</span>
+                          </div>
+                        </DeleteCategoryDialog>
                       ))}
                   </div>
                 </div>
@@ -158,15 +150,16 @@ export default async function DashboardPage() {
                     {categories
                       .filter((c: Category) => c.type === "EXPENSE")
                       .map((category: Category) => (
-                        <div
-                          key={category.id}
-                          className="flex items-center justify-between p-2 rounded-lg border"
-                          style={{
-                            borderColor: category.color || "#e2e8f0",
-                          }}
-                        >
-                          <span>{category.name}</span>
-                        </div>
+                        <DeleteCategoryDialog key={category.id} category={category}>
+                          <div
+                            className="flex items-center justify-between p-2 rounded-lg border cursor-pointer hover:bg-muted/50"
+                            style={{
+                              borderColor: category.color || "#e2e8f0",
+                            }}
+                          >
+                            <span>{category.name}</span>
+                          </div>
+                        </DeleteCategoryDialog>
                       ))}
                   </div>
                 </div>
@@ -174,6 +167,8 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        <DashboardGraphSwitcher expenseCategoryData={expenseCategoryData} incomeCategoryData={incomeCategoryData} cashFlowData={cashFlowData} monthlyData={monthlyData} />
       </div>
     </div>
   )
