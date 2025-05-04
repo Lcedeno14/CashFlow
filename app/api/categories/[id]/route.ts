@@ -3,10 +3,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/options"
 import { prisma } from "@/lib/prisma"
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, context: any) {
+  const { id } = context.params;
   try {
     const session = await getServerSession(authOptions)
 
@@ -16,7 +14,7 @@ export async function DELETE(
 
     const category = await prisma.category.findUnique({
       where: {
-        id: params.id,
+        id: id,
       },
     })
 
@@ -63,7 +61,7 @@ export async function DELETE(
     // Delete the category
     await prisma.category.delete({
       where: {
-        id: params.id,
+        id: id,
       },
     })
 
