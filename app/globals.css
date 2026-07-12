@@ -124,3 +124,103 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Auth marketing panel */
+.auth-panel-bg {
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 20%, rgba(16, 185, 129, 0.28), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 80%, rgba(6, 95, 70, 0.45), transparent 50%),
+    linear-gradient(160deg, #061510 0%, #0b2a22 45%, #0a1c18 100%);
+  animation: auth-bg-drift 18s ease-in-out infinite alternate;
+}
+
+.auth-panel-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 75% 70% at 50% 40%, black, transparent);
+}
+
+@keyframes auth-bg-drift {
+  from {
+    filter: hue-rotate(0deg) brightness(1);
+    transform: scale(1);
+  }
+  to {
+    filter: hue-rotate(8deg) brightness(1.05);
+    transform: scale(1.03);
+  }
+}
+
+.auth-fade-up {
+  animation: auth-fade-up 0.8s ease-out both;
+}
+
+.auth-fade-up-delay {
+  animation-delay: 0.15s;
+}
+
+.auth-fade-up-delay-2 {
+  animation-delay: 0.3s;
+}
+
+.auth-fade-up-delay-3 {
+  animation-delay: 0.45s;
+}
+
+@keyframes auth-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-flow-line {
+  stroke-dasharray: 700;
+  stroke-dashoffset: 700;
+  animation: auth-draw-line 1.6s ease-out 0.35s forwards;
+}
+
+.auth-flow-fill {
+  opacity: 0;
+  animation: auth-fade-fill 1s ease-out 0.9s forwards;
+}
+
+.auth-flow-dot {
+  opacity: 0;
+  animation: auth-fade-fill 0.5s ease-out 1.2s forwards;
+}
+
+.auth-flow-dot-delay {
+  animation-delay: 1.4s;
+}
+
+@keyframes auth-draw-line {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes auth-fade-fill {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-panel-bg,
+  .auth-fade-up,
+  .auth-flow-line,
+  .auth-flow-fill,
+  .auth-flow-dot {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    stroke-dashoffset: 0;
+  }
+}
