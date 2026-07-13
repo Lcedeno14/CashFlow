@@ -78,7 +78,6 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
               autoComplete="email"
               autoCorrect="off"
               disabled={isLoading}
-              defaultValue={searchParams.get("email") || ""}
               required
             />
           </div>
@@ -95,7 +94,6 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
               autoComplete="current-password"
               autoCorrect="off"
               disabled={isLoading}
-              defaultValue={searchParams.get("password") || ""}
               required
             />
           </div>

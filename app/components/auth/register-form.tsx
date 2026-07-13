@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Icons } from "@/app/components/icons"
 import { registerUser } from "@/app/actions/auth"
+import { PASSWORD_REQUIREMENTS, validatePassword } from "@/lib/password"
 
 interface RegisterFormProps {
   callbackUrl: string
@@ -40,6 +41,13 @@ export function RegisterForm({ callbackUrl }: RegisterFormProps) {
 
     if (password !== confirmPassword) {
       setError("Passwords do not match")
+      setIsLoading(false)
+      return
+    }
+
+    const passwordCheck = validatePassword(password)
+    if (!passwordCheck.ok) {
+      setError(passwordCheck.error)
       setIsLoading(false)
       return
     }
@@ -110,7 +118,6 @@ export function RegisterForm({ callbackUrl }: RegisterFormProps) {
               autoComplete="email"
               autoCorrect="off"
               disabled={isLoading}
-              defaultValue={searchParams.get("email") || ""}
               required
             />
           </div>
@@ -127,8 +134,11 @@ export function RegisterForm({ callbackUrl }: RegisterFormProps) {
               autoComplete="new-password"
               autoCorrect="off"
               disabled={isLoading}
+              minLength={8}
+              maxLength={72}
               required
             />
+            <p className="text-xs text-muted-foreground">{PASSWORD_REQUIREMENTS}</p>
           </div>
           <div className="grid gap-1">
             <Label className="sr-only" htmlFor="confirmPassword">
@@ -143,6 +153,8 @@ export function RegisterForm({ callbackUrl }: RegisterFormProps) {
               autoComplete="new-password"
               autoCorrect="off"
               disabled={isLoading}
+              minLength={8}
+              maxLength={72}
               required
             />
           </div>

@@ -2,6 +2,7 @@
 
 import { hash } from "bcryptjs"
 import { prisma } from "@/lib/prisma"
+import { validatePassword } from "@/lib/password"
 
 export async function registerUser(data: {
   name: string
@@ -9,6 +10,14 @@ export async function registerUser(data: {
   password: string
 }) {
   try {
+    const passwordCheck = validatePassword(data.password)
+    if (!passwordCheck.ok) {
+      return {
+        success: false,
+        error: passwordCheck.error,
+      }
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -72,4 +81,4 @@ export async function registerUser(data: {
       error: "Failed to create account",
     }
   }
-} 
+}
