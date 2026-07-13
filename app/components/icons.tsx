@@ -24,7 +24,6 @@ import {
   X,
   type Icon as LucideIcon,
   Github,
-  Mail,
 } from "lucide-react"
 
 export type Icon = typeof LucideIcon
@@ -54,5 +53,4 @@ export const Icons = {
   gitHub: Github,
   twitter: Twitter,
   check: Check,
-  google: Mail,
 } 

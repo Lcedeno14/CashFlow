@@ -20,7 +20,6 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    // Check for error in URL parameters
     const error = searchParams.get("error")
     if (error) {
       setError(error)
@@ -52,19 +51,6 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
     } catch (error) {
       setError("An unexpected error occurred")
       console.error("Login error:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  async function handleGoogleSignIn() {
-    setIsLoading(true)
-    setError(null)
-    try {
-      await signIn("google", { callbackUrl })
-    } catch (error) {
-      setError("Failed to sign in with Google")
-      console.error("Google sign-in error:", error)
     } finally {
       setIsLoading(false)
     }
@@ -127,24 +113,6 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
           </p>
         </div>
       </form>
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            Or continue with
-          </span>
-        </div>
-      </div>
-      <Button variant="outline" type="button" disabled={isLoading} onClick={handleGoogleSignIn}>
-        {isLoading ? (
-          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Icons.google className="mr-2 h-4 w-4" />
-        )}{" "}
-        Google
-      </Button>
     </div>
   )
-} 
+}
