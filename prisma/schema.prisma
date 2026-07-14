@@ -108,3 +108,14 @@ model Category {
   @@unique([name, userId])
   @@index([userId])
 }
+
+/// Sliding-window counters for auth rate limiting (login / register)
+model RateLimitBucket {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  count     Int      @default(0)
+  expiresAt DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([expiresAt])
+}

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Icons } from "@/app/components/icons"
+import { getLoginFailureMessage } from "@/app/actions/auth"
 
 interface LoginFormProps {
   callbackUrl: string
@@ -43,7 +44,8 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
       })
 
       if (result?.error) {
-        setError("Invalid email or password")
+        const message = await getLoginFailureMessage(email)
+        setError(message)
         return
       }
 

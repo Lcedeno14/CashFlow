@@ -2,6 +2,13 @@ import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
 import { compare } from "bcryptjs"
+import {
+  getClientIp,
+  hitRateLimit,
+  LOGIN_RATE_LIMIT,
+  loginEmailKey,
+  loginIpKey,
+} from "@/lib/rate-limit"
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -22,10 +29,31 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        const user = await prisma.user.findUnique({
+        const email = credentials.email.trim().toLowerCase()
+        const ip = await getClientIp()
+
+        const ipLimit = await hitRateLimit(
+          loginIpKey(ip),
+          LOGIN_RATE_LIMIT.maxAttempts,
+          LOGIN_RATE_LIMIT.windowMs
+        )
+        if (!ipLimit.ok) {
+          throw new Error("TOO_MANY_REQUESTS")
+        }
+
+        const emailLimit = await hitRateLimit(
+          loginEmailKey(email),
+          LOGIN_RATE_LIMIT.maxAttempts,
+          LOGIN_RATE_LIMIT.windowMs
+        )
+        if (!emailLimit.ok) {
+          throw new Error("TOO_MANY_REQUESTS")
+        }
+
+        const user = await prisma.user.findFirst({
           where: {
-            email: credentials.email
-          }
+            email: { equals: email, mode: "insensitive" },
+          },
         })
 
         if (!user || !user.password) {

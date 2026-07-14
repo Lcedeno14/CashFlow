@@ -3,6 +3,16 @@
 import { hash } from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 import { validatePassword } from "@/lib/password"
+import {
+  getClientIp,
+  hitRateLimit,
+  isRateLimited,
+  LOGIN_RATE_LIMIT,
+  loginEmailKey,
+  loginIpKey,
+  REGISTER_RATE_LIMIT,
+  registerIpKey,
+} from "@/lib/rate-limit"
 
 export async function registerUser(data: {
   name: string
@@ -10,6 +20,20 @@ export async function registerUser(data: {
   password: string
 }) {
   try {
+    const ip = await getClientIp()
+    const rateLimit = await hitRateLimit(
+      registerIpKey(ip),
+      REGISTER_RATE_LIMIT.maxAttempts,
+      REGISTER_RATE_LIMIT.windowMs
+    )
+
+    if (!rateLimit.ok) {
+      return {
+        success: false,
+        error: rateLimit.error,
+      }
+    }
+
     const passwordCheck = validatePassword(data.password)
     if (!passwordCheck.ok) {
       return {
@@ -18,11 +42,11 @@ export async function registerUser(data: {
       }
     }
 
+    const email = data.email.trim().toLowerCase()
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: {
-        email: data.email,
-      },
+      where: { email },
     })
 
     if (existingUser) {
@@ -41,7 +65,7 @@ export async function registerUser(data: {
       const newUser = await tx.user.create({
         data: {
           name: data.name,
-          email: data.email,
+          email,
           password: hashedPassword,
         },
       })
@@ -81,4 +105,20 @@ export async function registerUser(data: {
       error: "Failed to create account",
     }
   }
+}
+
+/** After a failed NextAuth sign-in, detect whether the failure was rate limiting. */
+export async function getLoginFailureMessage(email: string): Promise<string> {
+  const ip = await getClientIp()
+  const normalizedEmail = email.trim().toLowerCase()
+
+  const [ipStatus, emailStatus] = await Promise.all([
+    isRateLimited(loginIpKey(ip), LOGIN_RATE_LIMIT.maxAttempts),
+    isRateLimited(loginEmailKey(normalizedEmail), LOGIN_RATE_LIMIT.maxAttempts),
+  ])
+
+  if (!ipStatus.ok) return ipStatus.error
+  if (!emailStatus.ok) return emailStatus.error
+
+  return "Invalid email or password"
 }
