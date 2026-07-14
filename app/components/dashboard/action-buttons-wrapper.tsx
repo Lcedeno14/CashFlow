@@ -1,7 +1,7 @@
 "use client"
 
 import { ActionButtons } from "./action-buttons"
-import { Category } from "@prisma/client"
+import { Category } from "@/generated/prisma"
 
 interface ActionButtonsWrapperProps {
   categories: Category[]

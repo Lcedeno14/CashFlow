@@ -2,7 +2,7 @@
 
 import { AddCategoryDialog } from '@/app/components/categories/add-category-dialog'
 import { AddTransactionDialog } from '@/app/components/transactions/add-transaction-dialog'
-import { Category as PrismaCategory } from '@prisma/client'
+import { Category as PrismaCategory } from '@/generated/prisma'
 
 interface Category {
   id: string

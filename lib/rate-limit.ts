@@ -1,4 +1,5 @@
 import { headers } from "next/headers"
+import type { RateLimitBucket } from "@/generated/prisma"
 import { prisma } from "@/lib/prisma"
 
 export const LOGIN_RATE_LIMIT = {
@@ -40,7 +41,9 @@ export async function hitRateLimit(
   const now = new Date()
   const expiresAt = new Date(now.getTime() + windowMs)
 
-  const existing = await prisma.rateLimitBucket.findUnique({ where: { key } })
+  const existing: RateLimitBucket | null = await prisma.rateLimitBucket.findUnique({
+    where: { key },
+  })
 
   if (!existing || existing.expiresAt <= now) {
     await prisma.rateLimitBucket.upsert({
@@ -77,7 +80,9 @@ export async function isRateLimited(
   maxAttempts: number
 ): Promise<RateLimitResult> {
   const now = new Date()
-  const existing = await prisma.rateLimitBucket.findUnique({ where: { key } })
+  const existing: RateLimitBucket | null = await prisma.rateLimitBucket.findUnique({
+    where: { key },
+  })
 
   if (!existing || existing.expiresAt <= now || existing.count < maxAttempts) {
     return { ok: true }

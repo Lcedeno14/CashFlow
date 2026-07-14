@@ -1,7 +1,7 @@
 "use client"
 import { CardTitle } from "@/components/ui/card"
 import { AddTransactionDialog } from "@/app/components/transactions/add-transaction-dialog"
-import { Category } from "@prisma/client"
+import { Category } from "@/generated/prisma"
 
 export function TransactionsCardHeader({ categories }: { categories: Category[] }) {
   // Fix icon type for AddTransactionDialog
